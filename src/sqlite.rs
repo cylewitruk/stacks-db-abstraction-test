@@ -16,7 +16,7 @@ pub struct SQLiteDbParams {
 }
 
 
-impl<'conn> DbConnection for SQLiteDbImpl {
+impl DbConnection for SQLiteDbImpl {
     type Params = SQLiteDbParams;
     fn establish(params: SQLiteDbParams) -> Result<DbConnectionGuard<Self>> where Self: DbConnection {
         let conn = Connection::open(params.uri.clone())
@@ -24,7 +24,7 @@ impl<'conn> DbConnection for SQLiteDbImpl {
 
         let db = SQLiteDbImpl {
             params: params.clone(),
-            conn: conn
+            conn
         };
 
         Ok(DbConnectionGuard::new(db))
@@ -34,9 +34,9 @@ impl<'conn> DbConnection for SQLiteDbImpl {
 impl TransactionalDb for SQLiteDbImpl {
     type TxType<'conn> = SQLiteDbTransactionImpl<'conn> where Self: 'conn;
 
-    fn transaction<'conn, 'tx>(
-        &'conn mut self
-    ) -> Result<DbTransactionGuard<Self::TxType<'conn>>> {
+    fn transaction<'tx>(
+        &mut self
+    ) -> Result<DbTransactionGuard<Self::TxType<'_>>> {
         let inner_tx = self.conn.transaction()
             .expect("failed to begin transaction");
 

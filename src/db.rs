@@ -56,9 +56,9 @@ where
 {
     type TxType<'conn>: DbTransaction<'conn> where Self: 'conn;
     
-    fn transaction<'conn, 'tx>(
-        &'conn mut self
-    ) -> Result<DbTransactionGuard<Self::TxType<'conn>>>;
+    fn transaction(
+        &mut self
+    ) -> Result<DbTransactionGuard<Self::TxType<'_>>>;
 }
 
 /// Trait for database transactions.
@@ -121,6 +121,7 @@ where
     fn from_db(db: &DbConnectionGuard<DB>) -> Result<Self> where Self: Sized;
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum DbError {
     Database(String),

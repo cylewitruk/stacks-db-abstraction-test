@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::db::{TransactionalDb, FromDbConnection, DbConnectionGuard, Result};
+use crate::db::{TransactionalDb, FromDbConnection, DbConnectionGuard, Result, DbTransaction};
 
 pub trait MarfTrieDb {
     fn do_something_else_immut(&self);
@@ -33,10 +33,12 @@ where
         let mut conn = self.conn.borrow_mut();
         let tx = conn.transaction().unwrap();
 
-        todo!()
+        eprintln!("marfdb do_something_else_immut");
+
+        tx.commit().unwrap();
     }
 
     fn do_something_mut(&mut self) {
-        todo!()
+        eprintln!("marfdb do_something_mut");
     }
 }

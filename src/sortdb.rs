@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::db::{
-    TransactionalDb, Result, FromDbConnection, DbConnectionGuard
+    TransactionalDb, Result, FromDbConnection, DbConnectionGuard, DbTransaction
 };
 
 pub trait SortitionDb
@@ -24,7 +24,7 @@ where
 {
     fn from_db(db: &DbConnectionGuard<DB>) -> Result<Self> where Self: Sized {
         Ok(Self {
-            conn: Rc::clone(&db)
+            conn: Rc::clone(db)
         })
     }
 }
@@ -37,11 +37,13 @@ where
         let mut conn = self.conn.borrow_mut();
         let tx = conn.transaction().unwrap();
 
-        todo!()
+        eprintln!("sortdb: do_some_mut_thing");
+
+        tx.commit().unwrap();
     }
 
     fn do_some_immut_thing(&self) {
-        todo!()
+        eprintln!("sortdb: do_some_immut_thing");
     }
 }
 
