@@ -1,6 +1,6 @@
 use rusqlite::Connection;
 
-use crate::{
+use crate::db::{
     DbConnection, TransactionalDb, DbTransactionGuard, DbTransaction, DbError, 
     Result, DbConnectionGuard
 };
@@ -18,7 +18,7 @@ pub struct SQLiteDbParams {
 
 impl<'conn> DbConnection for SQLiteDbImpl {
     type Params = SQLiteDbParams;
-    fn establish(params: SQLiteDbParams) -> Result<crate::DbConnectionGuard<Self>> where Self: DbConnection {
+    fn establish(params: SQLiteDbParams) -> Result<DbConnectionGuard<Self>> where Self: DbConnection {
         let conn = Connection::open(params.uri.clone())
             .map_err(|e| DbError::Connection(e.to_string()))?;
 

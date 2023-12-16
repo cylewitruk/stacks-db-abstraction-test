@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{TransactionalDb, FromDbConnection, DbConnectionGuard, Result};
+use crate::db::{TransactionalDb, FromDbConnection, DbConnectionGuard, Result};
 
 pub trait MarfTrieDb {
     fn do_something_else_immut(&self);
