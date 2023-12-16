@@ -1,10 +1,10 @@
-use std::{rc::Rc, cell::RefCell, ops::Deref, marker::PhantomData};
+use std::{cell::RefCell, marker::PhantomData, ops::Deref, rc::Rc};
 
 /// Type to simplify error handling in the DB impls.
 pub type Result<T> = std::result::Result<T, DbError>;
 
 /// Base trait for database implementations which can be opened/connected to.
-/// This trait is used to abstract over the underlying database implementation, 
+/// This trait is used to abstract over the underlying database implementation,
 /// and provides a single method to establish a connection to the database.
 pub trait DbConnection: Sized {
     type Params: Clone;
@@ -17,7 +17,7 @@ pub trait DbConnection: Sized {
 /// for multiple ownership. This is useful for when multiple databases are "marf-ed",
 pub struct DbConnectionGuard<DB>
 where
-    DB: DbConnection
+    DB: DbConnection,
 {
     pub db: Rc<RefCell<DB>>,
 }
@@ -27,11 +27,11 @@ where
 /// into multiple database implementations, such as a SortitionDB + MarfTrieDB.
 impl<DB> DbConnectionGuard<DB>
 where
-    DB: DbConnection 
+    DB: DbConnection,
 {
     pub fn new(db: DB) -> Self {
         Self {
-            db: Rc::new(RefCell::new(db))
+            db: Rc::new(RefCell::new(db)),
         }
     }
 }
@@ -40,7 +40,7 @@ where
 /// from Rc<RefCell<>> boilerplate.
 impl<DB> Deref for DbConnectionGuard<DB>
 where
-    DB: DbConnection
+    DB: DbConnection,
 {
     type Target = Rc<RefCell<DB>>;
 
@@ -52,13 +52,13 @@ where
 /// Trait for database implementations which support transactions.
 pub trait TransactionalDb
 where
-    Self: DbConnection
+    Self: DbConnection,
 {
-    type TxType<'conn>: DbTransaction<'conn> where Self: 'conn;
-    
-    fn transaction(
-        &mut self
-    ) -> Result<DbTransactionGuard<Self::TxType<'_>>>;
+    type TxType<'conn>: DbTransaction<'conn>
+    where
+        Self: 'conn;
+
+    fn transaction(&mut self) -> Result<DbTransactionGuard<Self::TxType<'_>>>;
 }
 
 /// Trait for database transactions.
@@ -71,7 +71,7 @@ pub trait DbTransaction<'conn> {
 pub struct DbTransactionGuard<'conn, TxType>
 where
     TxType: DbTransaction<'conn>,
- {
+{
     tx: TxType,
     _phantom: PhantomData<&'conn ()>,
 }
@@ -80,7 +80,7 @@ where
 /// [DbTransactionGuard] to allow for the passing of a single DB transaction.
 impl<'conn, TxType> DbTransactionGuard<'conn, TxType>
 where
-    TxType: DbTransaction<'conn>
+    TxType: DbTransaction<'conn>,
 {
     pub fn new(tx: TxType) -> Self {
         Self {
@@ -101,7 +101,7 @@ where
     }
 }
 
-impl<'conn, TxType> DbTransaction<'conn> for DbTransactionGuard<'conn, TxType> 
+impl<'conn, TxType> DbTransaction<'conn> for DbTransactionGuard<'conn, TxType>
 where
     TxType: DbTransaction<'conn>,
 {
@@ -116,9 +116,11 @@ where
 
 pub trait FromDbConnection<DB>
 where
-    DB: DbConnection
+    DB: DbConnection,
 {
-    fn from_db(db: &DbConnectionGuard<DB>) -> Result<Self> where Self: Sized;
+    fn from_db(db: &DbConnectionGuard<DB>) -> Result<Self>
+    where
+        Self: Sized;
 }
 
 #[allow(dead_code)]

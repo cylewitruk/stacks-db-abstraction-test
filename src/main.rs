@@ -1,18 +1,18 @@
-use marfdb::{MarfTrieDbImpl, MarfTrieDb};
+use db::{DbConnection, FromDbConnection, Result};
+use marfdb::{MarfTrieDb, MarfTrieDbImpl};
 use sortdb::{SortitionDb, SortitionDbImpl};
 use sqlite::{SQLiteDbImpl, SQLiteDbParams};
-use db::{Result, DbConnection, FromDbConnection};
 
 mod db;
-mod sortdb;
 mod marfdb;
+mod sortdb;
 mod sqlite;
 
 fn main() -> Result<()> {
-    // This code demonstrates an internal wrapper for an sqlite db which implements internal 
+    // This code demonstrates an internal wrapper for an sqlite db which implements internal
     // traits [DbConnection] + [TransactionalDb].
     //
-    // This uses the Rc<RefCell<>> pattern to help with keeping the code + 
+    // This uses the Rc<RefCell<>> pattern to help with keeping the code +
     // lifetimes simpler. Synchronization logic is then responsible and isolated to
     // the impl of the [TransactionalDb] + [DbConnection] traits.
     //
@@ -24,21 +24,19 @@ fn main() -> Result<()> {
 
     // Define our connection parameters. [SQLiteDbParams] implements [DbConnection::Params].
     let connection_params = SQLiteDbParams {
-        uri: ":memory:".to_string()
+        uri: ":memory:".to_string(),
     };
 
     // Establish the connection to the database. [SQLiteDbImpl] implements [DbConnection].
     let db = SQLiteDbImpl::establish(connection_params)?;
-    
+
     // Create our sortition DB from the DB connection. [SortitionDbImpl] implements
     // [SortitionDb] and [FromDbConnection].
-    let mut sortdb = 
-        SortitionDbImpl::from_db(&db)?;
+    let mut sortdb = SortitionDbImpl::from_db(&db)?;
 
     // Create our marf trie DB from the DB connection. [MarfTrieDbImpl] implements
     // [MarfTrieDb] and [FromDbConnection].
-    let mut marf_trie_db =
-        MarfTrieDbImpl::from_db(&db)?;
+    let mut marf_trie_db = MarfTrieDbImpl::from_db(&db)?;
 
     // Do some stuff with the different DB's. Note that the same underlying [Connection]
     // is used, with synchronousy guarded by the DB impl via Rc<RefCell<>>.
