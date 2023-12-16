@@ -90,6 +90,8 @@ where
     }
 }
 
+/// Implementation of [Deref] for [DbTransactionGuard] which which helps keep
+/// the code clean from Rc<RefCell<>> boilerplate.
 impl<'conn, TxType> Deref for DbTransactionGuard<'conn, TxType>
 where
     TxType: DbTransaction<'conn>,
@@ -101,6 +103,8 @@ where
     }
 }
 
+/// Implementation of [DbTransaction] for [DbTransactionGuard] which allows
+/// the guard to be used as a [DbTransaction] and keep the code clean.
 impl<'conn, TxType> DbTransaction<'conn> for DbTransactionGuard<'conn, TxType>
 where
     TxType: DbTransaction<'conn>,
@@ -114,6 +118,7 @@ where
     }
 }
 
+/// Trait for database implementations which can be created from a [DbConnectionGuard].
 pub trait FromDbConnection<DB>
 where
     DB: DbConnection,
@@ -123,6 +128,7 @@ where
         Self: Sized;
 }
 
+/// Enum for database errors.
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum DbError {

@@ -2,11 +2,13 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::db::{DbConnectionGuard, DbTransaction, FromDbConnection, Result, TransactionalDb};
 
+/// Trait which defines, as an example, "MARF" database operations.
 pub trait MarfTrieDb {
     fn do_something_else_immut(&self);
     fn do_something_mut(&mut self);
 }
 
+/// An example implementation of a DB struct.
 pub struct MarfTrieDbImpl<DB>
 where
     DB: TransactionalDb,
@@ -14,6 +16,8 @@ where
     conn: Rc<RefCell<DB>>,
 }
 
+/// Implementation of [FromDbConnection] which allows for the creation of this
+/// database implementation from a [DbConnectionGuard].
 impl<DB> FromDbConnection<DB> for MarfTrieDbImpl<DB>
 where
     DB: TransactionalDb,
@@ -28,6 +32,7 @@ where
     }
 }
 
+/// Implementation of [MarfTrieDb] for [MarfTrieDbImpl].
 impl<DB> MarfTrieDb for MarfTrieDbImpl<DB>
 where
     DB: TransactionalDb,
