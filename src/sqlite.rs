@@ -32,7 +32,7 @@ impl<'conn> DbConnection for SQLiteDbImpl {
 }
 
 impl TransactionalDb for SQLiteDbImpl {
-    type TxType<'conn> = SomeDbTransactionImpl<'conn> where Self: 'conn;
+    type TxType<'conn> = SQLiteDbTransactionImpl<'conn> where Self: 'conn;
 
     fn transaction<'conn, 'tx>(
         &'conn mut self
@@ -40,7 +40,7 @@ impl TransactionalDb for SQLiteDbImpl {
         let inner_tx = self.conn.transaction()
             .expect("failed to begin transaction");
 
-        let tx = SomeDbTransactionImpl { 
+        let tx = SQLiteDbTransactionImpl { 
             tx: inner_tx
         };
 
@@ -48,11 +48,11 @@ impl TransactionalDb for SQLiteDbImpl {
     }
 }
 
-pub struct SomeDbTransactionImpl<'conn> {
+pub struct SQLiteDbTransactionImpl<'conn> {
     tx: rusqlite::Transaction<'conn>
 }
 
-impl<'conn> DbTransaction<'conn> for SomeDbTransactionImpl<'conn> {
+impl<'conn> DbTransaction<'conn> for SQLiteDbTransactionImpl<'conn> {
     fn commit(self) -> Result<()> {
         self.tx.commit()
             .map_err(|e| DbError::Commit(e.to_string()))

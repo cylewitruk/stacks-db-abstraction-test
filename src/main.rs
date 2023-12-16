@@ -1,9 +1,11 @@
 use std::{ops::Deref, marker::PhantomData, cell::RefCell, rc::Rc};
 
-use db_trait::{SortitionDb, SortitionDbImpl, MarfTrieDbImpl, MarfTrieDb};
+use marfdb::{MarfTrieDbImpl, MarfTrieDb};
+use sortdb::{SortitionDb, SortitionDbImpl};
 use sqlite::{SQLiteDbImpl, SQLiteDbParams};
 
-mod db_trait;
+mod sortdb;
+mod marfdb;
 mod sqlite;
 
 /// Type to simplify error handling in the DB impls.
